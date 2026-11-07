@@ -1,0 +1,11 @@
+.git
+.gitignore
+.DS_Store
+**/node_modules
+extension
+test
+README.md
+LICENSE
+THIRD_PARTY_NOTICES.md
+Dockerfile
+.dockerignore

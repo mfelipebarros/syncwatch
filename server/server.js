@@ -2,12 +2,26 @@
 // No accounts, no persistence, and it never sees any audio/video: media flows
 // directly between the participants' browsers; this only relays the handshake.
 const { randomBytes } = require("node:crypto");
+const http = require("node:http");
 const { WebSocketServer } = require("ws");
 
 const PORT = process.env.PORT || 8787;
+
+// Plain HTTP only answers health checks (Coolify, load balancers, uptime monitors);
+// everything else is WebSocket.
+const server = http.createServer((req, res) => {
+  if (req.url === "/healthz") {
+    res.writeHead(200, { "Content-Type": "text/plain" });
+    res.end("ok");
+  } else {
+    res.writeHead(426, { "Content-Type": "text/plain", Upgrade: "websocket" });
+    res.end("SyncWatch relay: connect with a WebSocket client.");
+  }
+});
+
 // SDP offers with video can run several KB, so signaling needs more headroom
 // than chat/state messages do.
-const wss = new WebSocketServer({ port: PORT, maxPayload: 64 * 1024 });
+const wss = new WebSocketServer({ server, maxPayload: 64 * 1024 });
 const rooms = new Map(); // id -> { id, clients:Set<ws>, state }
 
 const send = (ws, obj) => ws.readyState === 1 && ws.send(JSON.stringify(obj));
@@ -82,4 +96,13 @@ wss.on("connection", (ws) => {
   ws.on("error", () => {});
 });
 
-console.log(`SyncWatch relay listening on ws://localhost:${PORT}`);
+server.listen(PORT, () => console.log(`SyncWatch relay listening on port ${PORT} (ws://localhost:${PORT})`));
+
+// Containers get SIGTERM on redeploy: close sockets so clients reconnect promptly.
+for (const sig of ["SIGTERM", "SIGINT"]) {
+  process.on(sig, () => {
+    for (const c of wss.clients) c.close(1001, "server restarting");
+    server.close(() => process.exit(0));
+    setTimeout(() => process.exit(0), 3000).unref();
+  });
+}

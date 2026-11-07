@@ -14,7 +14,27 @@ page's `<video>` element directly (including inside iframes), so it is not tied 
    A party starts and the invite link is copied.
 4. Your friend (also with the extension) opens the link and joins automatically. The relay address travels inside the link.
 
-For friends outside your network, deploy `server/` somewhere with a public `wss://` URL and set it under **Settings** in the chat panel.
+For friends outside your network, deploy the relay somewhere with a public `wss://` URL and set it under **Settings** in the chat panel.
+
+## Deploy the relay (Docker / Coolify)
+
+The root `Dockerfile` builds only the relay (a ~60 MB Node image that runs as a non-root user).
+It listens on `PORT` (default `8787`), answers `GET /healthz` with `200 ok`, and shuts down cleanly on `SIGTERM`.
+
+```bash
+docker build -t syncwatch-relay .
+docker run -d -p 8787:8787 syncwatch-relay
+```
+
+On **Coolify**: New Resource → this repository → build pack **Dockerfile** (no base directory needed) →
+*Ports Exposes* `8787` → set your domain (Coolify issues the HTTPS certificate, and the proxy passes WebSocket
+upgrades through, so clients use `wss://your-domain`) → health check path `/healthz`.
+
+Then point the extension at it: the address is saved per user in **Settings**, and invite links carry the relay
+address, so friends need no setup. To make it the default for everyone, change `DEFAULT_SERVER` in
+`extension/background.js` and `extension/chat/chat.js`.
+
+Voice/video also needs a TURN server for people behind strict NATs; see below.
 
 ## Features
 

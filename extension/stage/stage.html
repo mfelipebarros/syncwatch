@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="color-scheme" content="light">
+  <style>
+    html,body{margin:0;height:100%;background:transparent;overflow:hidden}
+    .tile{position:absolute;display:none;border-radius:14px;overflow:hidden;background:#17111a}
+    .tile video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#17111a}
+    .tile.self video{transform:scaleX(-1)}
+    .tile.nocam video{visibility:hidden}
+    .avatar{position:absolute;inset:0;display:none;align-items:center;justify-content:center}
+    .tile.nocam .avatar{display:flex}
+    .avatar b{width:44%;aspect-ratio:1;max-width:72px;border-radius:50%;display:grid;place-items:center;color:#fff;
+      font:600 26px/1 system-ui,sans-serif;background:linear-gradient(135deg,#fb7185,#f43f5e)}
+    .tile.speak{box-shadow:inset 0 0 0 3px #fb7185}
+  </style>
+</head>
+<body>
+  <script src="mesh.js"></script>
+  <script src="stage.js"></script>
+</body>
+</html>

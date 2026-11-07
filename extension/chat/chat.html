@@ -1,0 +1,136 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="color-scheme" content="light">
+  <style>
+    :root{
+      --brand:#f43f5e; --brand-2:#fb7185;
+      --text:#f8eef1; --muted:rgba(248,238,241,.58);
+      --line:rgba(255,255,255,.10); --surface:rgba(255,255,255,.07); --surface-hi:rgba(255,255,255,.12);
+    }
+    *{box-sizing:border-box;font:13px/1.45 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+    html,body{margin:0;height:100%;background:transparent;color:var(--text)}
+    [hidden]{display:none !important}
+    .screen{height:100%;display:flex;flex-direction:column}
+
+    /* header */
+    .hdr{display:flex;align-items:center;gap:10px;padding:14px 14px 10px;flex:none}
+    .logo{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:#fff;
+      background:linear-gradient(135deg,var(--brand-2),var(--brand));box-shadow:0 6px 16px rgba(244,63,94,.38)}
+    .ttl{flex:1;min-width:0}
+    .ttl b{display:block;font-weight:600;font-size:14px}
+    .ttl span{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px}
+    .dot{width:7px;height:7px;border-radius:50%;background:#34d399;box-shadow:0 0 0 3px rgba(52,211,153,.18)}
+    .ib{width:32px;height:32px;border:0;border-radius:10px;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer;padding:0}
+    .ib:hover{background:var(--surface-hi);color:var(--text)}
+
+    /* buttons + inputs */
+    .btn{display:flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;padding:11px 14px;font-weight:600;color:#fff;cursor:pointer}
+    .btn.primary{width:100%;background:linear-gradient(135deg,var(--brand-2),var(--brand));box-shadow:0 8px 20px rgba(244,63,94,.35)}
+    .btn.primary:hover{filter:brightness(1.08)}
+    .btn.primary:disabled{opacity:.45;cursor:default;box-shadow:none}
+    .btn.soft{background:var(--surface);border:1px solid var(--line);color:var(--text);padding:10px 14px}
+    .btn.soft:hover{background:var(--surface-hi)}
+    input{min-width:0;width:100%;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px 12px;outline:none}
+    input::placeholder{color:var(--muted)}
+    input:focus{border-color:rgba(244,63,94,.7);box-shadow:0 0 0 3px rgba(244,63,94,.18)}
+    label{display:block;margin:12px 0 5px;color:var(--muted);font-size:12px}
+    .row{display:flex;gap:8px}
+
+    /* start screen */
+    #start .body{padding:6px 16px 16px;overflow:auto}
+    #start h2{margin:10px 0 4px;font-size:19px;font-weight:650;letter-spacing:-.01em}
+    #start p{margin:0 0 16px;color:var(--muted)}
+    .or{display:flex;align-items:center;gap:10px;margin:18px 0 6px;color:var(--muted);font-size:12px}
+    .or:before,.or:after{content:"";flex:1;border-top:1px solid var(--line)}
+    details{margin-top:16px;color:var(--muted)}
+    summary{cursor:pointer;display:flex;align-items:center;gap:8px;list-style:none}
+    summary::-webkit-details-marker{display:none}
+    #err{color:#ff8a9b;min-height:1.2em;margin-top:8px}
+
+    /* party screen */
+    .share{margin:0 14px 8px;padding:6px 6px 6px 12px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:flex;align-items:center;gap:6px;flex:none}
+    .share input{border:0;background:transparent;padding:6px 0;color:var(--muted);font-size:12px;text-overflow:ellipsis;box-shadow:none}
+    .share .copy{width:auto;height:32px;padding:0 10px;gap:6px;font-size:12px;font-weight:600;color:#fff;background:linear-gradient(135deg,var(--brand-2),var(--brand));border-radius:10px;display:flex;align-items:center;border:0;cursor:pointer;flex:none}
+    .call{display:flex;gap:8px;margin:0 14px 8px;flex:none}
+    .tg{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 10px;border-radius:12px;cursor:pointer;
+      border:1px solid var(--line);background:var(--surface);color:var(--muted);font-weight:600;font-size:12.5px}
+    .tg:hover{background:var(--surface-hi);color:var(--text)}
+    .tg.on{color:#fff;border-color:transparent;background:linear-gradient(135deg,var(--brand-2),var(--brand));box-shadow:0 6px 16px rgba(244,63,94,.3)}
+    .hint{margin:-2px 16px 8px;color:var(--muted);font-size:11.5px}
+    textarea{width:100%;min-height:54px;resize:vertical;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:8px 10px;outline:none;font:12px/1.4 ui-monospace,Menlo,monospace}
+    textarea:focus{border-color:rgba(244,63,94,.7);box-shadow:0 0 0 3px rgba(244,63,94,.18)}
+    #msgs{flex:1;overflow:auto;padding:8px 14px;display:flex;flex-direction:column;gap:6px}
+    #msgs::-webkit-scrollbar{width:6px}
+    #msgs::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:3px}
+    .m{max-width:86%;display:flex;flex-direction:column;gap:2px}
+    .m small{color:var(--muted);font-size:11px;padding:0 4px}
+    .m span{padding:8px 12px;border-radius:14px 14px 14px 4px;background:var(--surface-hi);word-break:break-word}
+    .m.me{align-self:flex-end;align-items:flex-end}
+    .m.me span{border-radius:14px 14px 4px 14px;background:linear-gradient(135deg,rgba(251,113,133,.92),rgba(244,63,94,.92))}
+    .sys{align-self:center;color:var(--muted);font-size:11.5px;padding:2px 8px}
+    form{display:flex;gap:8px;padding:10px 14px 14px;flex:none}
+    form input{border-radius:999px;padding:10px 16px}
+    .send{width:40px;height:40px;flex:none;border:0;border-radius:50%;display:grid;place-items:center;color:#fff;cursor:pointer;padding:0;
+      background:linear-gradient(135deg,var(--brand-2),var(--brand));box-shadow:0 6px 16px rgba(244,63,94,.35)}
+  </style>
+</head>
+<body>
+  <!-- Not in a party on this tab -->
+  <div class="screen" id="start" hidden>
+    <div class="hdr">
+      <div class="logo" data-icon="users-group" data-size="18"></div>
+      <div class="ttl"><b>SyncWatch</b></div>
+      <button class="ib" id="hide" title="Close" data-icon="x"></button>
+    </div>
+    <div class="body">
+      <h2>Watch together</h2>
+      <p id="where">Start a party and share the link. Everyone is synced automatically.</p>
+      <button class="btn primary" id="startBtn"><span data-icon="users-plus" data-size="18"></span>Start watch party</button>
+      <div id="err"></div>
+      <div class="or">or join one</div>
+      <div class="row">
+        <input id="code" placeholder="Paste invite link or code" autocomplete="off">
+        <button class="btn soft" id="joinBtn">Join</button>
+      </div>
+      <details>
+        <summary><span data-icon="settings" data-size="16"></span>Settings</summary>
+        <label for="name">Your name</label>
+        <input id="name" maxlength="24">
+        <label for="server">Relay server</label>
+        <input id="server" placeholder="ws://localhost:8787">
+        <label for="ice">Voice/video servers (ICE, JSON, optional)</label>
+        <textarea id="ice" spellcheck="false" placeholder='[{"urls":"stun:stun.l.google.com:19302"}]'></textarea>
+      </details>
+    </div>
+  </div>
+
+  <!-- In a party -->
+  <div class="screen" id="party" hidden>
+    <div class="hdr">
+      <div class="logo" data-icon="users-group" data-size="18"></div>
+      <div class="ttl"><b>Watch party</b><span><i class="dot"></i><em id="peers" style="font-style:normal">1 watching</em></span></div>
+      <button class="ib" id="pick" title="Choose which video to sync" data-icon="focus-2"></button>
+      <button class="ib" id="leave" title="Leave party" data-icon="logout"></button>
+      <button class="ib" id="collapse" title="Hide chat" data-icon="chevron-right"></button>
+    </div>
+    <div class="share">
+      <input id="link" readonly title="Invite link">
+      <button class="copy" id="copy"><span data-icon="copy" data-size="15"></span><em id="copyLabel" style="font-style:normal">Copy link</em></button>
+    </div>
+    <div class="call">
+      <button class="tg" id="mic" title="Turn microphone on or off"><span id="micIcon"></span><span id="micLabel">Mic off</span></button>
+      <button class="tg" id="cam" title="Turn camera on or off"><span id="camIcon"></span><span id="camLabel">Camera off</span></button>
+    </div>
+    <div class="hint" id="callHint" hidden></div>
+    <div id="msgs"></div>
+    <form id="form">
+      <input id="text" placeholder="Message…" maxlength="500" autocomplete="off">
+      <button class="send" title="Send" data-icon="send" data-size="18"></button>
+    </form>
+  </div>
+  <script src="../icons.js"></script>
+  <script src="chat.js"></script>
+</body>
+</html>
